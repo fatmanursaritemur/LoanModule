@@ -8,7 +8,6 @@ import com.turkcell.loanmodule.entities.enums.ECustomer;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,6 +23,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,7 +43,9 @@ public class Customer implements IEntity, Serializable {
   @Column(name =  "customer_id")
   private Long id;
 
+  @NotBlank
  // @UniqueElements
+  @Column(unique=true)
   private String tcNo;
 
   private String fullName;
@@ -57,11 +59,13 @@ public class Customer implements IEntity, Serializable {
 
   @NotBlank
   @Size(max = 20)
+  @Column(unique=true)
   private String username;
 
   @NotBlank
   @Size(max = 50)
   @Email
+  @Column(unique=true)
   private String email; // unique yap
 
   @NotBlank
@@ -81,12 +85,13 @@ public class Customer implements IEntity, Serializable {
   @Column(name = "credit_note")
   private int creditNote=0;
 
+ @NotNull(message="monthlyIncome is Mandatory")
  @Column(name =  "monthly_Income")
   private  BigDecimal monthlyIncome;
 
- @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+ @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
 @JsonBackReference("pen-seller") //sarmal yapı için
- private Credit credit;
+ private Set<Credit> credit;
 
  @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,fetch=FetchType.LAZY)
 //@JsonManagedReference("file-customer") //sarmal yapı için
@@ -102,8 +107,8 @@ public class Customer implements IEntity, Serializable {
 // @JsonManagedReference("credithistories-customer")
  private Set<CreditHistory> creditHistories;
 
- public void setCredit(Credit credit) {
+/* public void setCredit(Credit credit) {
   this.credit = credit;
   credit.setCustomer(this);
- }
+ }*/
 }

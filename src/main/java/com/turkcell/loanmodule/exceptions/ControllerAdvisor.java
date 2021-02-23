@@ -46,6 +46,17 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(AutoRejectCreditException.class)
+  public ResponseEntity<Object> handleMAutoRejectCreditException(
+      AutoRejectCreditException ex) {
+
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(TIMESTAMP, LocalDateTime.now());
+    body.put(MESSAGE, ex.getMessage());
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.BAD_GATEWAY)

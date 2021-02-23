@@ -2,6 +2,7 @@ package com.turkcell.loanmodule.entities.concretes;
 
 import com.turkcell.loanmodule.entities.abstracts.IEntity;
 import com.turkcell.loanmodule.entities.dtos.CreditApplianceResultDto;
+import com.turkcell.loanmodule.entities.enums.CreditCustomerStatus;
 import com.turkcell.loanmodule.entities.enums.CreditStatus;
 import com.turkcell.loanmodule.entities.enums.ECredit;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -19,6 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Data;
@@ -31,10 +33,11 @@ public class Credit implements IEntity, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToOne(fetch=FetchType.LAZY)
-  @JoinColumn(name = "customer_id")
+  @ManyToOne(fetch=FetchType.LAZY)
+  @JoinColumn(name = "customer_id", unique = false)
   @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
   @JsonBackReference("pen-seller")
+
   private Customer customer;
 
   private BigDecimal loanAmount;
@@ -50,9 +53,13 @@ public class Credit implements IEntity, Serializable {
   @Enumerated(EnumType.STRING)
   private ECredit creditType=ECredit.POSTPAID;
 
+  @Enumerated(EnumType.STRING)
+  private CreditCustomerStatus customerApproval=null;
+
   @OneToOne(mappedBy = "credit", cascade = CascadeType.ALL, fetch=FetchType.LAZY,  orphanRemoval = true)
   @JsonBackReference //sarmal yapı için
   private CreditApplianceResultDto creditApplianceResultDto;
+
 
   // onaylayan eklenebilir
 
