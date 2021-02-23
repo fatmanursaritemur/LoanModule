@@ -41,7 +41,7 @@ public class CreditHistoryController {
   }
 
   @GetMapping("/gettscore/{id}")
-  BigDecimal getCreditScoreOfCustomer(@PathVariable(value = "id") Long id) throws Exception {
+  Integer getCreditScoreOfCustomer(@PathVariable(value = "id") Long id) throws Exception {
     Customer customer=customerService.findById(id);
     return  creditHistoryService.getCreditScoreOfCustomer(customer);
   }

@@ -33,14 +33,14 @@ public class CreditHistoryManager implements ICreditHistoryService {
   }
 
   @Override
-  public BigDecimal getCreditScoreOfCustomer(Customer customer) { ///
+  public Integer getCreditScoreOfCustomer(Customer customer) { ///
     return creditHistoryRepository.findAllByCustomer(customer).stream()
         .filter(creditHistory -> creditHistory.getPaymentDay()!=null)
         .map(creditHistory -> creditHistory.getLoanAmount()
             .multiply(BigDecimal.valueOf(ChronoUnit.DAYS
                 .between(creditHistory.getDeadline(), creditHistory.getPaymentDay()))))
         .reduce(BigDecimal.ZERO, BigDecimal::add)
-        .divide(BigDecimal.valueOf(10));
+        .divide(BigDecimal.valueOf(10)).intValue();
   }
 
   @Override
@@ -74,7 +74,8 @@ public class CreditHistoryManager implements ICreditHistoryService {
   @Override
   public Boolean isGotLoanLessThanAMonth(
       Customer customer) {
+
     return findAllByCustomer(customer).stream().anyMatch(
-        creditHistory -> creditHistory.getDeadline().isBefore(LocalDate.now().minusMonths(1)));
+        creditHistory -> creditHistory.getDeadline().isAfter(LocalDate.now().minusMonths(1)));
   }
 }

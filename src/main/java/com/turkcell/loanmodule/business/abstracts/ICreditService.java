@@ -5,6 +5,7 @@ import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.exceptions.AutoRejectCreditException;
 import com.turkcell.loanmodule.exceptions.CustomerOnBlacklistException;
 import com.turkcell.loanmodule.exceptions.MissingDocumentException;
+import java.util.List;
 import java.util.Set;
 
 public interface ICreditService {
@@ -34,5 +35,9 @@ public interface ICreditService {
 
   Set<Credit> getCustomerByCredit(Long id) throws Exception;
 
- // CreditApplianceResultDto saveCreditApplianceResultDtoByCredit(Credit credit, String reason);
+  List<Credit> getRiskyLoanApplications();
+
+  void rejectAllRiskyLoanApplications();
+
+  // CreditApplianceResultDto saveCreditApplianceResultDtoByCredit(Credit credit, String reason);
 }

@@ -13,7 +13,9 @@ import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.entities.enums.CreditStatus;
 import com.turkcell.loanmodule.exceptions.AutoRejectCreditException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +51,9 @@ public class CreditManager implements ICreditService {
     Customer customerChecked = customerService.findById(credit.getCustomer().getId());
     isExistCustomersIdAndCreditPhotocopies(customerChecked, credit);
     isCustomerOnBlacklist(customerChecked, credit);
-    isCustomerUnderEighteen(customerChecked,credit);
-    isCustomerEverBeenProsecuted(customerChecked,credit);
+    isCustomerUnderEighteen(customerChecked, credit);
+    isCustomerEverBeenProsecuted(customerChecked, credit);
+    isGotLoanLessThanAMonth(customerChecked, credit);
     return creditRepository.save(credit);
     //kaydedildi yap
   }
@@ -60,16 +63,17 @@ public class CreditManager implements ICreditService {
       throws AutoRejectCreditException {
     if ( Boolean.FALSE.equals(fileService.isExistCustomersIdAndCreditPhotocopies(customer)) ) {
       rejectCredit(credit, "Customer has missing documents");
-      throw new AutoRejectCreditException("Müşterinin eksik belgeleri var olması",customer.getId());
+      throw new AutoRejectCreditException("Müşterinin eksik belgeleri var olması",
+          customer.getId());
     }
   }
 
   @Override
-  public  void  isCustomerUnderEighteen(Customer customer, Credit credit)
+  public void isCustomerUnderEighteen(Customer customer, Credit credit)
       throws AutoRejectCreditException {
-    if( LocalDate.now().getYear()-customer.getBirthDate().getYear()<18 ){
+    if ( LocalDate.now().getYear() - customer.getBirthDate().getYear() < 18 ) {
       rejectCredit(credit, "Customer is under 18");
-      throw new AutoRejectCreditException("Müşterinin 18 yaşından küçük olması",customer.getId());
+      throw new AutoRejectCreditException("Müşterinin 18 yaşından küçük olması", customer.getId());
     }
   }
 
@@ -78,7 +82,7 @@ public class CreditManager implements ICreditService {
       throws AutoRejectCreditException {
     if ( Boolean.TRUE.equals(blacklistService.isCustomerOnBlacklist(customer)) ) {
       rejectCredit(credit, "Customer in blacklist");
-      throw new AutoRejectCreditException("Müşterinin kara listede olması ",customer.getId());
+      throw new AutoRejectCreditException("Müşterinin kara listede olması ", customer.getId());
     }
   }
 
@@ -87,16 +91,18 @@ public class CreditManager implements ICreditService {
       throws AutoRejectCreditException {
     if ( Boolean.TRUE.equals(legalProceedingRepository.existsByTcNo(customer.getTcNo())) ) { // ??
       rejectCredit(credit, "Customer was under legal proceedings");
-      throw new AutoRejectCreditException("Müşterinin yasal takibe maruz kalmış olması",customer.getId());
+      throw new AutoRejectCreditException("Müşterinin yasal takibe maruz kalmış olması",
+          customer.getId());
     }
   }
 
   @Override
-  public  void isGotLoanLessThanAMonth(Customer customer,Credit credit)
+  public void isGotLoanLessThanAMonth(Customer customer, Credit credit)
       throws AutoRejectCreditException {
-    if ( Boolean.FALSE.equals(creditHistoryService.isGotLoanLessThanAMonth(customer)) ) { // ??
+    if ( Boolean.TRUE.equals(creditHistoryService.isGotLoanLessThanAMonth(customer)) ) { // ??
       rejectCredit(credit, "got loan less than a month");
-      throw new AutoRejectCreditException("Bir aydan kısa süre önce kredi alınması",customer.getId());
+      throw new AutoRejectCreditException("Bir aydan kısa süre önce kredi alınması",
+          customer.getId());
     }
   }
 
@@ -114,6 +120,31 @@ public class CreditManager implements ICreditService {
   }
 
 
+
+  @Override // controller'a ekle
+  public List<Credit> getRiskyLoanApplications() {
+    return creditRepository.findAll().
+        stream()
+        .filter(credit -> credit.getStatus() == CreditStatus.APPLIED)
+        .filter(credit ->
+            credit.getCustomer().getMonthlyIncome().intValue() + credit.getCustomer().getCreditNote() + 1000 >
+            (credit.getLoanAmount().intValue()) * (12 / credit.getTerm()))
+        .collect(Collectors.toList());
+
+  }
+
+  @Override // controller'a ekle, eğer o an giriş yapan employee'yi tutyorsa onu da set et
+  public  void rejectAllRiskyLoanApplications(){
+     getRiskyLoanApplications().forEach(
+        credit -> {
+          credit.setStatus(CreditStatus.DENIED);
+          creditRepository.save(credit);
+          rejectCredit(credit,"loan application found risky");
+        }
+    );
+  }
+
+
   /****************************** FOR TEST*********************************/
   @Override
   public Customer getCustomer(Long id) throws Exception {
@@ -125,5 +156,21 @@ public class CreditManager implements ICreditService {
   public Set<Credit> getCustomerByCredit(Long id) throws Exception {
     return getCredit(id).getCustomer().getCredit();
   }
+
+    /*@Override
+  public List<Credit> getRiskyLoanApplications() {
+    List<Credit> creditList = null;
+    creditRepository.findAll().
+        stream()
+        .filter(credit -> credit.getStatus() == CreditStatus.APPLIED)
+        .forEach(credit -> {
+          if ( (credit.getCustomer().getMonthlyIncome().intValue() + credit.getCustomer()
+              .getCreditNote()) + 1000 > (credit.getLoanAmount().intValue()) * (12 / credit
+              .getTerm()) ) {
+            creditList.add(credit);
+          }
+        });
+    return creditList;
+  }*/
 
 }

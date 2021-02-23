@@ -2,13 +2,16 @@ package com.turkcell.loanmodule.api.controllers;
 
 import com.turkcell.loanmodule.business.abstracts.ICustomerService;
 import com.turkcell.loanmodule.business.abstracts.IFileService;
+import com.turkcell.loanmodule.entities.concretes.Credit;
 import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.entities.dtos.ResponseMessage;
+import com.turkcell.loanmodule.entities.enums.CreditCustomerStatus;
 import com.turkcell.loanmodule.entities.enums.EPhotocopy;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,11 +38,29 @@ public class CustomerController {
   }
 
   // buraya -- user gelecek
-  @PostMapping("/savephotocopy/{customerid}/{forwhat}")
-  public ResponseEntity<ResponseMessage> savePhotocopy(@RequestParam("file") MultipartFile file, @PathVariable(value = "customerid") long customerid,
-      @PathVariable(value = "forwhat") EPhotocopy forwhat)  throws Exception {
-    Customer customer=customerService.findById(customerid);
-    return fileService.uploadFile(file,customer,forwhat);
+  @PostMapping("/savePhotocopy/{customerId}/{forWhat}")
+  public ResponseEntity<ResponseMessage> savePhotocopy(@RequestParam("file") MultipartFile file,
+      @PathVariable(value = "customerId") long customerId,
+      @PathVariable(value = "forWhat") EPhotocopy forWhat) throws Exception {
+    Customer customer = customerService.findById(customerId);
+    return fileService.uploadFile(file, customer, forWhat);
   }
 
+  // admin ve ya moderator
+  @GetMapping("/setcreditNot/{customerId}")
+  public Integer setCreditScore(@PathVariable(value = "customerId") long customerId)
+      throws Exception {
+    Customer customer = customerService.findById(customerId);
+    return customerService.setCreditScore(customer);
+  }
+
+  //user
+  @GetMapping("evaluateModifiedCredit/{customerId}/{creditCustomerStatus}")
+  public void evaluateModifiedCredit(@PathVariable(value = "customerId") long customerId,
+      @PathVariable(value = "creditCustomerStatus") CreditCustomerStatus creditCustomerStatus)
+      throws Exception {
+
+    Customer customer = customerService.findById(customerId);
+    customerService.evaluateModifiedCredit(customer,creditCustomerStatus);
+  }
 }

@@ -1,7 +1,10 @@
 package com.turkcell.loanmodule.api.controllers;
 
+import com.turkcell.loanmodule.dataAccess.PhoneBillRepository;
+import com.turkcell.loanmodule.entities.concretes.PhoneBill;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/test")
 public class TestController {
+
+  @Autowired
+  PhoneBillRepository phoneBillRepository;
 
   @PostMapping("/all")
   public String allAccess(@RequestBody String aa) {
@@ -45,5 +51,10 @@ public class TestController {
   @PreAuthorize("hasRole('ADMIN')")
   public String adminAccess() {
     return "Admin Board.";
+  }
+
+  @PostMapping("/savePhoneBill")
+  public PhoneBill savePhoneBill(@RequestBody PhoneBill phoneBill){
+    return phoneBillRepository.save(phoneBill);
   }
 }

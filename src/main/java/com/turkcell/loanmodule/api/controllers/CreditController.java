@@ -5,6 +5,7 @@ import com.turkcell.loanmodule.entities.concretes.Credit;
 import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.exceptions.CustomerOnBlacklistException;
 import com.turkcell.loanmodule.exceptions.MissingDocumentException;
+import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,10 @@ public class CreditController {
   @GetMapping("/cus/{id}")
   public Set<Credit> getCustomerByCrdit(@PathVariable(value = "id") Long id ) throws Exception {
     return creditService.getCustomerByCredit(id);
+  }
+
+  // auto --- 5000 in arası olanlar
+  public List<Credit> getRiskyLoanApplications(){
+    return creditService.getRiskyLoanApplications();
   }
 }
