@@ -45,7 +45,7 @@ public class IFileManager extends IFileService {
     List<ResponseFile> files = storageService.getAllFiles().map(dbFile -> {
       String fileDownloadUri = ServletUriComponentsBuilder
           .fromCurrentContextPath()
-          .path("/files/")
+          .path("api/v1/file/files/")
           .path(dbFile.getId())
           .toUriString();
 
