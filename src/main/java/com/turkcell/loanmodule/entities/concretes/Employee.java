@@ -44,7 +44,6 @@ public class Employee implements IEntity, Serializable {
 
   @NotBlank
   @Size(max = 50)
-  // @Email
   private String email;
 
   @NotBlank

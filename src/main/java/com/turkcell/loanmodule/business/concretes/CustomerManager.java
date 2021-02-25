@@ -97,7 +97,6 @@ public class CustomerManager implements ICustomerService {
         .sorted(Comparator.comparing(CreditApplianceResultDto::getResultDay))
         .findFirst()
         .get();
-    // buraya bak
   }
 
   @Override

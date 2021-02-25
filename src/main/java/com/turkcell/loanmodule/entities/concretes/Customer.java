@@ -63,7 +63,7 @@ public class Customer implements IEntity, Serializable {
   @Size(max = 50)
   @Email
   @Column(unique = true)
-  private String email; // unique yap
+  private String email;
 
   @NotBlank
   @Size(max = 120)
