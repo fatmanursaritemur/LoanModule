@@ -28,22 +28,21 @@ public class Blacklist implements IEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-//  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-@ManyToOne(fetch=FetchType.LAZY, optional=true)
-@JoinColumn(name = "customer_id", nullable = true)
-@JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
-@NotNull
-@JsonBackReference("blacklist-customer")
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "customer_id", nullable = true)
+  @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
+  @NotNull
+  @JsonBackReference("blacklist-customer")
   private Customer customer;
 
 
   @NotNull
   private LocalDate entryDate;
 
-  private LocalDate  terminationDate;
+  private LocalDate terminationDate;
 
-  public Blacklist(Customer customer, LocalDate  date) {
-    this.customer=customer;
-    this.entryDate=date;
+  public Blacklist(Customer customer, LocalDate date) {
+    this.customer = customer;
+    this.entryDate = date;
   }
 }

@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PropertyRepository  extends JpaRepository<Property, String> {
+public interface PropertyRepository extends JpaRepository<Property, String> {
 
 
   @Query(value = "SELECT propertyValue FROM Property u WHERE u.propertyName = ?1")
   String findPropertyValueByPropertyName(String propertyName);
 
   @Query(value = "SELECT u FROM Property u WHERE u.propertyName = ?1")
-   Property findPropertyByPropertyName(String propertyName);
+  Property findPropertyByPropertyName(String propertyName);
 }

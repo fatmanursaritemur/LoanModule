@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,9 @@ public class CreditHistoryManager implements ICreditHistoryService {
   }
 
   @Override
-  public Integer getCreditScoreOfCustomer(Customer customer) { ///
+  public Integer getCreditScoreOfCustomer(Customer customer) {
     return creditHistoryRepository.findAllByCustomer(customer).stream()
-        .filter(creditHistory -> creditHistory.getPaymentDay()!=null)
+        .filter(creditHistory -> creditHistory.getPaymentDay() != null)
         .map(creditHistory -> creditHistory.getLoanAmount()
             .multiply(BigDecimal.valueOf(ChronoUnit.DAYS
                 .between(creditHistory.getDeadline(), creditHistory.getPaymentDay()))))
@@ -51,10 +52,12 @@ public class CreditHistoryManager implements ICreditHistoryService {
   @Override
   public void saveAllCreditHistory(Credit credit) throws Exception {
     Credit credit1 = creditService.getCredit(credit.getId());
+    System.out.println("******************* credit*******************");
+    System.out.println("******************* credit*******************");
     CreditHistory creditHistory = modelMapper.map(credit1, CreditHistory.class);
     creditHistory.setCustomer(credit1.getCustomer());
     LocalDate localDate = credit1.getCustomer().getSubscriptionDate().plusMonths(1);
-    saveEachCreditHistory(creditHistory,credit1.getTerm(),localDate);
+    saveEachCreditHistory(creditHistory, credit1.getTerm(), localDate);
    /* for ( int i = 0; i < credit1.getTerm(); i++ ) { // ayrı fonksiyon yap
       creditHistory.setDeadline(localDate);
       creditHistoryRepository.save(creditHistory);
@@ -63,7 +66,7 @@ public class CreditHistoryManager implements ICreditHistoryService {
   }
 
   @Override
-  public void saveEachCreditHistory(CreditHistory creditHistory, int term, LocalDate localDate ) {
+  public void saveEachCreditHistory(CreditHistory creditHistory, int term, LocalDate localDate) {
     for ( int i = 0; i < term; i++ ) {
       creditHistory.setDeadline(localDate);
       creditHistoryRepository.save(creditHistory);
@@ -77,5 +80,13 @@ public class CreditHistoryManager implements ICreditHistoryService {
 
     return findAllByCustomer(customer).stream().anyMatch(
         creditHistory -> creditHistory.getDeadline().isAfter(LocalDate.now().minusMonths(1)));
+  }
+
+  @Override
+  public List<CreditHistory> getOutstandingLoans() {
+    return creditHistoryRepository.findAll()
+        .stream()
+        .filter(creditHistory -> creditHistory.getPaymentDay() == null)
+        .collect(Collectors.toList());
   }
 }

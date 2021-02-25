@@ -3,7 +3,6 @@ package com.turkcell.loanmodule.entities.concretes;
 import com.turkcell.loanmodule.entities.abstracts.IEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

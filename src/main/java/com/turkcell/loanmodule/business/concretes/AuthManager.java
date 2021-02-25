@@ -2,14 +2,15 @@ package com.turkcell.loanmodule.business.concretes;
 
 import com.turkcell.loanmodule.business.abstracts.IAuthService;
 import com.turkcell.loanmodule.business.abstracts.IPropertyService;
-import com.turkcell.loanmodule.entities.concretes.Customer;
+import com.turkcell.loanmodule.dataAccess.CustomerRepository;
+import com.turkcell.loanmodule.dataAccess.EmployeeRepository;
 import com.turkcell.loanmodule.entities.enums.ERole;
 import com.turkcell.loanmodule.entities.concretes.Role;
 import com.turkcell.loanmodule.entities.concretes.User;
-import com.turkcell.loanmodule.payload.request.LoginRequest;
-import com.turkcell.loanmodule.payload.request.SignupRequest;
-import com.turkcell.loanmodule.payload.response.JwtResponse;
-import com.turkcell.loanmodule.payload.response.MessageResponse;
+import com.turkcell.loanmodule.security.payload.request.LoginRequest;
+import com.turkcell.loanmodule.security.payload.request.SignupRequest;
+import com.turkcell.loanmodule.security.payload.response.JwtResponse;
+import com.turkcell.loanmodule.security.payload.response.MessageResponse;
 import com.turkcell.loanmodule.dataAccess.RoleRepository;
 import com.turkcell.loanmodule.dataAccess.UserRepository;
 import com.turkcell.loanmodule.security.jwt.JwtUtils;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthManager implements IAuthService {
+
   @Autowired
   AuthenticationManager authenticationManager;
 
@@ -39,6 +41,11 @@ public class AuthManager implements IAuthService {
   @Autowired
   RoleRepository roleRepository;
 
+  @Autowired
+  CustomerRepository customerRepository;
+
+  @Autowired
+  EmployeeRepository employeeRepository;
   @Autowired
   PasswordEncoder encoder;
 
@@ -50,10 +57,11 @@ public class AuthManager implements IAuthService {
 
   @Override
 
-  public ResponseEntity<?> authenticateUser( LoginRequest loginRequest) {
+  public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
 
     Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+            loginRequest.getPassword()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = jwtUtils.generateJwtToken(authentication);
@@ -63,6 +71,8 @@ public class AuthManager implements IAuthService {
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
+    setCurrentUser(roles, userDetails);
+
     return ResponseEntity.ok(new JwtResponse(jwt,
         userDetails.getId(),
         userDetails.getUsername(),
@@ -71,14 +81,30 @@ public class AuthManager implements IAuthService {
   }
 
   @Override
+  public void setCurrentUser(List<String> roles, UserDetailsImpl userDetails) {
+    if ( roles.contains(ERole.ROLE_USER.toString()) ) {
+      propertyService.setProperty("currentCustomer",
+          customerRepository.findByUsername(userDetails.getUsername()).getId());
+    }
+    if ( roles.contains(ERole.ROLE_MODERATOR.toString()) ) {
+      propertyService.setProperty("currentEmployee",
+          employeeRepository.findByUsername(userDetails.getUsername()).getId());
+    }
+    if ( roles.contains(ERole.ROLE_ADMIN.toString()) ) {
+      propertyService.setProperty("Admin",
+          employeeRepository.findByUsername(userDetails.getUsername()).getId());
+    }
+  }
+
+  @Override
   public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest) {
-    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+    if ( userRepository.existsByUsername(signUpRequest.getUsername()) ) {
       return ResponseEntity
           .badRequest()
           .body(new MessageResponse("Error: Username is already taken!"));
     }
 
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+    if ( userRepository.existsByEmail(signUpRequest.getEmail()) ) {
       return ResponseEntity
           .badRequest()
           .body(new MessageResponse("Error: Email is already in use!"));
@@ -92,7 +118,7 @@ public class AuthManager implements IAuthService {
     Set<String> strRoles = signUpRequest.getRole();
     Set<Role> roles = new HashSet<>();
 
-    if (strRoles == null) {
+    if ( strRoles == null ) {
       Role userRole = roleRepository.findByName(ERole.ROLE_USER)
           .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
       roles.add(userRole);
@@ -132,16 +158,16 @@ public class AuthManager implements IAuthService {
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
 
+
   @Override
-  public Customer test() throws Exception {
-    return  propertyService.getCurrentCustomer();
+  public void logout() {
+    deleteAllProperties();
   }
 
   @Override
-  public void deleteCurrentCustomerAndCredit() {
-    propertyService.deleteCurrentCustomerAndCredit();
+  public void deleteAllProperties() {
+    propertyService.deleteAllProperties();
   }
-
 
 
 }

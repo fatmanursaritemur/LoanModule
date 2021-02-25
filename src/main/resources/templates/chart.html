@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<!--[if IE 8]>
+<html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]>
+<html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!--<![endif]-->
+
+<head>
+  <title>Turkcell Admin DashBoard </title>
+  <meta content="This demo shows how to use HighCharts with Spring Boot" name="description"/>
+  <object th:include="fragments/head :: head" th:remove="tag"></object>
+
+  <link th:href="@{/pages/css/profile.min.css}" rel="stylesheet" type="text/css"/>
+</head>
+
+<body class="page-container-bg-solid">
+<div th:include="fragments/topmenuheader :: header"></div>
+<div class="page-container">
+  <div class="page-content-wrapper">
+    <div class="page-head" style="background-color:#eff3f8;padding-top:40px">
+      <div class="container">
+        <div class="row" style="margin-bottom:30px">
+          <div class="col-md-12">
+            <h1 style="text-align:center">2021 Dashboard</h1>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:30px">
+          <div class="col-md-6" style="margin-top:20px">
+            <div id="salesByType" style="width:100%; height:400px;"></div>
+          </div>
+          <div class="col-md-6" style="margin-top:20px">
+            <div id="salesByRegion" style="width:100%; height:400px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div th:include="fragments/homefooter :: footer"></div>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  $(function () {
+    Highcharts.setOptions({
+      lang: {
+        decimalPoint: '.',
+        thousandsSep: ','
+      }
+    });
+
+    drawSalesByTypeChart();
+    drawSalesByRegionChart();
+  });
+
+  function drawSalesByRegionChart() {
+    var salesByRegionChart = Highcharts.chart('salesByRegion', {
+      chart: {
+        type: 'pie',
+        margin: 40,
+        options3d: {
+          enabled: true,
+          alpha: 45,
+          beta: 0
+        }
+      },
+      title: {
+        text: 'Haftalık Onaylanan Kredi Sayıları'
+      },
+      tooltip: {
+        pointFormat: "{point.y:,.0f} kişi"
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          depth: 35
+        }
+      },
+      series: [{
+        name: 'Günler',
+        colorByPoint: true,
+        data: [{
+          name: 'pazartesi',
+          y: /*[[${MONDAY}]]*/ 0
+        }, {
+          name: 'salı',
+          y: /*[[${TUESDAY}]]*/ 0
+        }, {
+          name: 'çarşamba',
+          y: /*[[${WEDNESDAY}]]*/ 0
+        }, {
+          name: 'perşembe',
+          y: /*[[${THURSDAY}]]*/ 0
+        },
+          {
+            name: 'cuma',
+            y: /*[[${FRIDAY}]]*/ 0
+          },
+          {
+            name: 'cumartesi',
+            y: /*[[${SATURDAY}]]*/ 0
+          },
+          {
+            name: 'pazar',
+            y: /*[[${MONDAY}]]*/ 0
+          }
+        ]
+      }]
+    });
+  }
+
+  function drawSalesByTypeChart() {
+    var salesByTypeChart = Highcharts.chart('salesByType', {
+      chart: {
+        type: 'column',
+        margin: 80,
+        options3d: {
+          enabled: true,
+          alpha: 15,
+          beta: 15,
+          depth: 110
+        }
+      },
+      title: {
+        text: 'Kredi durumuna göre aylık trendler'
+      },
+      xAxis: {
+        categories: ['Kabul', 'Red', 'Beklemede','Zamanı doldu', 'Analizde' ]
+      },
+      yAxis: {
+        title: {
+          text: 'Sales (US $)'
+        }
+      },
+      tooltip: {
+        pointFormat: "{point.y:,.0f}"
+      },
+      plotOptions: {
+        column: {
+          depth: 100,
+          stacking: true,
+          grouping: false,
+          groupZPadding: 10
+        }
+      },
+      series: [{
+        name: 'şubat',
+        data: /*[[${status1}]]*/ []
+      }, {
+        name: 'mart',
+        data: /*[[${status2}]]*/ []
+      }, {
+        name: 'nisan',
+        data: /*[[${status3}]]*/ []
+      },
+        {
+          name: 'mayıs',
+          data: /*[[${status4}]]*/ []
+        },
+        {
+          name: 'haziran',
+          data: /*[[${status5}]]*/ []
+        },
+        {
+          name: 'temmuz',
+          data: /*[[${status6}]]*/ []
+        },
+        {
+          name: 'ağustos',
+          data: /*[[${status7}]]*/ []
+        },
+        {
+          name: 'eylül',
+          data: /*[[${status8}]]*/ []
+        },
+        {
+          name: 'ekim',
+          data: /*[[${status9}]]*/ []
+        },
+        {
+          name: 'kasım',
+          data: /*[[${status10}]]*/ []
+        },
+        {
+          name: 'aralık',
+          data: /*[[${status11}]]*/ []
+        },
+        {
+          name: 'ocak',
+          data: /*[[${status12}]]*/ []
+        }]
+    });
+  }
+
+  /*]]>*/
+</script>
+
+</body>
+</html>

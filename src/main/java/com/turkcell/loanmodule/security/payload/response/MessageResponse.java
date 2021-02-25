@@ -1,4 +1,4 @@
-package com.turkcell.loanmodule.payload.response;
+package com.turkcell.loanmodule.security.payload.response;
 
 public class MessageResponse {
 	private String message;

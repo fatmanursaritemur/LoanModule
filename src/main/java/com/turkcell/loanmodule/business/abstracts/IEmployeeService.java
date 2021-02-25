@@ -1,9 +1,17 @@
 package com.turkcell.loanmodule.business.abstracts;
 
-public interface IEmployeeService  {
-// employee ekle
+import com.turkcell.loanmodule.entities.concretes.Credit;
+import com.turkcell.loanmodule.entities.concretes.Employee;
+import java.util.List;
 
-  // rol değiştir
+public interface IEmployeeService {
 
-  // onayladığı kredileri getir ------------
+  Employee save(Employee employee);
+
+  Employee findById(Long id) throws Exception;
+
+  Employee getEmployeeByUsername(String username);
+
+  List<Employee> findAll();
+
 }

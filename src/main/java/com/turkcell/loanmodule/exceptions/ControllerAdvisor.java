@@ -24,27 +24,6 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
   private static final String MESSAGE = "message";
   private static final String TIMESTAMP = "timestamp";
 
-  @ExceptionHandler(CustomerOnBlacklistException.class)
-  public ResponseEntity<Object> handleCustomerOnBlacklistException(
-      CustomerOnBlacklistException ex) {
-
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put(TIMESTAMP, LocalDateTime.now());
-    body.put(MESSAGE, ex.getMessage());
-
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(MissingDocumentException.class)
-  public ResponseEntity<Object> handleMissingDocumentException(
-      MissingDocumentException ex) {
-
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put(TIMESTAMP, LocalDateTime.now());
-    body.put(MESSAGE, ex.getMessage());
-
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-  }
 
   @ExceptionHandler(AutoRejectCreditException.class)
   public ResponseEntity<Object> handleMAutoRejectCreditException(
@@ -57,6 +36,16 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<Object> handleNotFoundException(
+      NotFoundException ex) {
+
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(TIMESTAMP, LocalDateTime.now());
+    body.put(MESSAGE, ex.getMessage());
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.BAD_GATEWAY)

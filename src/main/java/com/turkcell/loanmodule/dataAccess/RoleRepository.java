@@ -10,5 +10,6 @@ import com.turkcell.loanmodule.entities.concretes.Role;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
+
   Optional<Role> findByName(ERole name);
 }

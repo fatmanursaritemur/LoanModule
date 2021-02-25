@@ -43,7 +43,8 @@ public class BlacklistManager implements IBlacklistService {
     return findAllByCustomer(customer).stream()
         .filter(blacklist -> (blacklist.getTerminationDate() != null))
         .collect(Collectors.toList()).stream().mapToInt(
-            forday -> (int) ChronoUnit.DAYS.between(forday.getEntryDate(), forday.getTerminationDate()))
+            forday -> (int) ChronoUnit.DAYS
+                .between(forday.getEntryDate(), forday.getTerminationDate()))
         .sum();
 
   }

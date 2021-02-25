@@ -17,7 +17,7 @@ public class FileStorageService {
   @Autowired
   private FileDBRepository fileDBRepository;
 
-   FileDB store(MultipartFile file, EPhotocopy forwhat, Customer customer)
+  FileDB store(MultipartFile file, EPhotocopy forwhat, Customer customer)
       throws IOException {
     String fileName = StringUtils.cleanPath(file.getOriginalFilename());
     FileDB FileDB = new FileDB(fileName, file.getContentType(), file.getBytes(), forwhat, customer);
@@ -25,20 +25,20 @@ public class FileStorageService {
     return fileDBRepository.save(FileDB);
   }
 
-   FileDB getFile(String id) {
+  FileDB getFile(String id) {
     return fileDBRepository.findById(id).get();
   }
 
-   Stream<FileDB> getAllFiles() {
+  Stream<FileDB> getAllFiles() {
     return fileDBRepository.findAll().stream();
   }
 
-   Boolean isExistCustomersIdAndCreditPhotocopies(Customer customer) {
+  Boolean isExistCustomersIdAndCreditPhotocopies(Customer customer) {
     return fileDBRepository.findAllByCustomer(customer)
         .stream()
-        .anyMatch(fileDB -> fileDB.getForWhat()==EPhotocopy.CREDIT) &&
+        .anyMatch(fileDB -> fileDB.getForWhat() == EPhotocopy.CREDIT) &&
         fileDBRepository.findAllByCustomer(customer)
             .stream()
-            .anyMatch(fileDB -> fileDB.getForWhat()==EPhotocopy.ID);
+            .anyMatch(fileDB -> fileDB.getForWhat() == EPhotocopy.ID);
   }
 }

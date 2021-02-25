@@ -13,9 +13,12 @@ public interface ICreditHistoryService {
   Integer getCreditScoreOfCustomer(Customer customer);
 
   CreditHistory save(CreditHistory creditHistory);
+
   void saveAllCreditHistory(Credit credit) throws Exception;
 
   void saveEachCreditHistory(CreditHistory creditHistory, int term, LocalDate localDate);
 
   Boolean isGotLoanLessThanAMonth(Customer customer);
+
+  List<CreditHistory> getOutstandingLoans();
 }

@@ -3,7 +3,7 @@ package com.turkcell.loanmodule.entities.concretes;
 import com.turkcell.loanmodule.entities.abstracts.IEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -20,11 +20,12 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 @Entity
 @Table(name = "payment_histories")
 public class CreditHistory implements IEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.ALL)
   @JoinColumn(name = "customer_id", nullable = false)
   @JsonBackReference("credithistories-customer")
   private Customer customer;

@@ -1,0 +1,114 @@
+<header>
+    <link rel="stylesheet" th:href="@{css/material.min.css}"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript" />
+    <script src="scripts/material.min.js" th:src="@{scripts/material.min.js}" type="text/javascript"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}" />
+
+    <script th:src="@{/webjars/jquery/3.1.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+    <div class="row">
+        <div class="col-xl-1 col-lg-1 col-md-1 col-sm-3 grid-margin stretch-card">
+        </div>
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <i class="mdi mdi-cube text-danger icon-lg"></i>
+                        </div>
+                        <div class="float-right">
+                            <p class="mb-0 text-right">Toplam Kredi Açığı </p>
+                            <div class="fluid-container">
+                                <h3 class="font-weight-medium text-right mb-0">[[${creditGap}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="mdi mdi-alert-octagon mr-1" aria-hidden="true"></i> 65% arttı
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <i class="mdi mdi-receipt text-warning icon-lg"></i>
+                        </div>
+                        <div class="float-right">
+                            <p class="mb-0 text-right">Günlük yeni üye sayısı</p>
+                            <div class="fluid-container">
+                                <h3 class="font-weight-medium text-right mb-0">[[${numberOfDailySubscriberRegistration}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="mdi mdi-bookmark-outline mr-1" aria-hidden="true"></i> yeni üyeler
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <i class="mdi mdi-poll-box text-success icon-lg"></i>
+                        </div>
+                        <div class="float-right">
+                            <p class="mb-0 text-right">Günlük toplam kredi miktarı</p>
+                            <div class="fluid-container">
+                                <h3 class="font-weight-medium text-right mb-0">[[${numberOfDailyTotalCredit}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="mdi mdi-calendar mr-1" aria-hidden="true"></i>  %200 artş
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <i class="mdi mdi-account-location text-info icon-lg"></i>
+                        </div>
+                        <div class="float-right">
+                            <p class="mb-0 text-right">Toplam Müşteri Sayısı</p>
+                            <div class="fluid-container">
+                                <h3 class="font-weight-medium text-right mb-0"> [[${numberOfCustomer}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="mdi mdi-reload mr-1" aria-hidden="true"></i> %30 arttı
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <div class="float-left">
+                            <i class="mdi mdi-account-location text-info icon-lg"></i>
+                        </div>
+                        <div class="float-right">
+                            <p class="mb-0 text-right">Toplam Çalışan Sayısı</p>
+                            <div class="fluid-container">
+                                <h3 class="font-weight-medium text-right mb-0">[[${numberOfEmployee}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">
+                        <i class="mdi mdi-reload mr-1" aria-hidden="true"></i> %5 oranında büyüme
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

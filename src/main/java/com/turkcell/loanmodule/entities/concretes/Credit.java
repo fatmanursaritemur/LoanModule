@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.MonthDay;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,15 +28,15 @@ import lombok.Data;
 @Entity
 @Table(name = "credits")
 public class Credit implements IEntity, Serializable {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch=FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id", unique = false)
   @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
   @JsonBackReference("pen-seller")
-
   private Customer customer;
 
   private BigDecimal loanAmount;
@@ -46,21 +45,25 @@ public class Credit implements IEntity, Serializable {
   private Integer term;
 
   @Enumerated(EnumType.STRING)
-  private CreditStatus status=CreditStatus.APPLIED;
+  private CreditStatus status = CreditStatus.APPLIED;
 
-  private MonthDay termDay;
-
-  @Enumerated(EnumType.STRING)
-  private ECredit creditType=ECredit.POSTPAID;
+  private Integer termDay;
 
   @Enumerated(EnumType.STRING)
-  private CreditCustomerStatus customerApproval=null;
+  private ECredit creditType = ECredit.POSTPAID;
 
-  @OneToOne(mappedBy = "credit", cascade = CascadeType.ALL, fetch=FetchType.LAZY,  orphanRemoval = true)
-  @JsonBackReference //sarmal yapı için
+  @Enumerated(EnumType.STRING)
+  private CreditCustomerStatus customerApproval = null;
+
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "employee_id", unique = true)
+  @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
+  @JsonBackReference("credit-customer")
+  private Employee employee;
+
+  @OneToOne(mappedBy = "credit", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JsonBackReference
   private CreditApplianceResultDto creditApplianceResultDto;
 
-
-  // onaylayan eklenebilir
 
 }

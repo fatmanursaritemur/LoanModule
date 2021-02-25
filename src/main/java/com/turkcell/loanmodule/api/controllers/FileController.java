@@ -32,6 +32,7 @@ public class FileController {
      return  fileService.uploadFile(file, customer, EPhotocopy.CREDIT);
   }
 
+
   @GetMapping("/files")
   public ResponseEntity<List<ResponseFile>> getListFiles() {
   return fileService.getListFiles();

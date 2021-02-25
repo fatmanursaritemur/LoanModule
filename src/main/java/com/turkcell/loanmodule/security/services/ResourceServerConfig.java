@@ -12,15 +12,14 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
   private static final String[] AUTH_WHITELIST = {
 
       "/h2-console/**",
+      "/files/**"
   };
 
   @Override
   public void configure(HttpSecurity http) throws Exception {
 
-
     http.requestMatchers().antMatchers(AUTH_WHITELIST).and().
         authorizeRequests().antMatchers("/person/**").authenticated();
-
 
     http.headers().frameOptions().disable();
   }

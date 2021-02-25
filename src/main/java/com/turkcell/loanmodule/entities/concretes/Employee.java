@@ -1,56 +1,63 @@
 package com.turkcell.loanmodule.entities.concretes;
 
-import com.turkcell.loanmodule.validation.ValidPhoneNumber;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.turkcell.loanmodule.entities.abstracts.IEntity;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Data
 @Entity
 @Table(name = "employees")
-public class Employee  {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+public class Employee implements IEntity, Serializable {
 
-   @UniqueElements
-   private String tcNo;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-   private String fullName;
+  @Column(unique = true)
+  private String tcNo;
 
-   @ValidPhoneNumber(message="Please enter a valid phone number")
-   private String phoneNumber;
+  private String fullName;
 
-   @NotBlank
-   @Size(max = 200, min = 20)
-   @Email
-   private String address;
+  private String phoneNumber;
 
-   @NotBlank
-   @Size(max = 20)
-   private String username;
+  @NotBlank
+  @Size(max = 200, min = 20)
+  private String address;
 
-   @NotBlank
-   @Size(max = 50)
-   @Email
-   private String email;
+  @NotBlank
+  @Size(max = 20)
+  private String username;
 
-   @NotBlank
-   @Size(max = 120)
-   private String password;
+  @NotBlank
+  @Size(max = 50)
+  // @Email
+  private String email;
 
-   private  String jobTitle;
+  @NotBlank
+  @Size(max = 120)
+  private String password;
 
-   private  String department;
+  private String jobTitle;
 
-   private LocalDate dateOfEmployment;
+  private String department;
+
+  private LocalDate dateOfEmployment;
+
+  @OneToMany(mappedBy = "employee", cascade = CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JsonBackReference("credit-customer") //sarmal yapı için
+  private Set<Credit> Credit;
 }

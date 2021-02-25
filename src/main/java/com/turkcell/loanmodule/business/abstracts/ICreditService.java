@@ -3,41 +3,56 @@ package com.turkcell.loanmodule.business.abstracts;
 import com.turkcell.loanmodule.entities.concretes.Credit;
 import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.exceptions.AutoRejectCreditException;
-import com.turkcell.loanmodule.exceptions.CustomerOnBlacklistException;
-import com.turkcell.loanmodule.exceptions.MissingDocumentException;
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 public interface ICreditService {
 
-  Credit apply(Credit credit) throws Exception;
+  List<Credit> getHighLoanApplications();
+
+  List<Credit> getNormalLoanApplications();
+
+  List<Credit> getAllLoanApplications();
 
   Credit getCredit(Long id) throws Exception;
 
-  void isExistCustomersIdAndCreditPhotocopies(Customer customer,Credit credit)
-      throws MissingDocumentException, AutoRejectCreditException;
+  Credit apply(Credit credit) throws Exception;
 
-  void  isCustomerUnderEighteen(Customer customer, Credit credit)
-      throws MissingDocumentException, AutoRejectCreditException;
+  Credit rejectCredit(Credit credit, String reason);
+
+  Credit rejectCreditByEmployee(Credit credit, String reason) throws Exception;
+
+  Credit approvalCreditByEmployee(Credit credit) throws Exception;
+
+  List<Credit> getRiskyLoanApplications();
+
+  Customer getCustomer(Long id) throws Exception;
+
+  void isExistCustomersIdAndCreditPhotocopies(Customer customer, Credit credit)
+      throws AutoRejectCreditException;
+
+  void isCustomerUnderEighteen(Customer customer, Credit credit)
+      throws AutoRejectCreditException;
 
   void isCustomerOnBlacklist(Customer customer, Credit credit)
-      throws CustomerOnBlacklistException, AutoRejectCreditException;
+      throws AutoRejectCreditException;
 
   void isCustomerEverBeenProsecuted(Customer customer, Credit credit)
-      throws CustomerOnBlacklistException, AutoRejectCreditException;
+      throws AutoRejectCreditException;
 
   void isGotLoanLessThanAMonth(Customer customer, Credit credit)
       throws AutoRejectCreditException;
 
-  Credit rejectCredit(Credit credit,String reason);
-
-  Customer getCustomer(Long id) throws Exception;
 
   Set<Credit> getCustomerByCredit(Long id) throws Exception;
 
-  List<Credit> getRiskyLoanApplications();
-
   void rejectAllRiskyLoanApplications();
 
-  // CreditApplianceResultDto saveCreditApplianceResultDtoByCredit(Credit credit, String reason);
+  List<Credit> getCreditApprovalByDay(LocalDate localDate);
+
+
+  List<List<BigInteger>> findCreditsByCustomerSubscriptionDateMonth(LocalDate localDate);
+
 }

@@ -6,18 +6,22 @@ import com.turkcell.loanmodule.business.abstracts.ICreditHistoryService;
 import com.turkcell.loanmodule.business.abstracts.ICreditService;
 import com.turkcell.loanmodule.business.abstracts.ICustomerService;
 import com.turkcell.loanmodule.business.abstracts.IFileService;
+import com.turkcell.loanmodule.business.abstracts.IPropertyService;
 import com.turkcell.loanmodule.dataAccess.CreditRepository;
 import com.turkcell.loanmodule.dataAccess.LegalProceedingRepository;
 import com.turkcell.loanmodule.entities.concretes.Credit;
 import com.turkcell.loanmodule.entities.concretes.Customer;
 import com.turkcell.loanmodule.entities.enums.CreditStatus;
 import com.turkcell.loanmodule.exceptions.AutoRejectCreditException;
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -45,6 +49,9 @@ public class CreditManager implements ICreditService {
   @Autowired
   ICreditHistoryService creditHistoryService;
 
+  @Autowired
+  IPropertyService propertyService;
+
   @Transactional
   @Override
   public Credit apply(Credit credit) throws Exception {
@@ -55,7 +62,6 @@ public class CreditManager implements ICreditService {
     isCustomerEverBeenProsecuted(customerChecked, credit);
     isGotLoanLessThanAMonth(customerChecked, credit);
     return creditRepository.save(credit);
-    //kaydedildi yap
   }
 
   @Override
@@ -115,35 +121,104 @@ public class CreditManager implements ICreditService {
   }
 
   @Override
-  public Credit getCredit(Long id) throws Exception {
-    return creditRepository.findById(id).orElseThrow(Exception::new);
+  public Credit rejectCreditByEmployee(Credit credit, String reason) throws Exception {
+    credit.setStatus(CreditStatus.DENIED);
+    credit.setEmployee(propertyService.getCurrentEmployee()); //current employee
+    Credit creditt = creditRepository.save(credit);
+    creditApplianceResultDtoService.saveCreditApplianceResultDtoByCredit(creditt, reason);
+    return creditt;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
+  public Credit approvalCreditByEmployee(Credit credit) throws Exception {
+    credit.setStatus(CreditStatus.APPROVED);
+    credit.setEmployee(propertyService.getCurrentEmployee());//current employee
+    Credit creditt = creditRepository.save(credit);
+    creditHistoryService.saveAllCreditHistory(creditt);
+    credit.getCustomer().setSubscriptionDate(LocalDate.now());
+    credit.setTermDay(LocalDate.now().getDayOfMonth());
+    creditApplianceResultDtoService.saveCreditApplianceResultDtoByCredit(creditt, "approval");
+    return creditt;
   }
 
 
-
-  @Override // controller'a ekle
+  @Override
   public List<Credit> getRiskyLoanApplications() {
     return creditRepository.findAll().
         stream()
         .filter(credit -> credit.getStatus() == CreditStatus.APPLIED)
         .filter(credit ->
-            credit.getCustomer().getMonthlyIncome().intValue() + credit.getCustomer().getCreditNote() + 1000 >
-            (credit.getLoanAmount().intValue()) * (12 / credit.getTerm()))
+            credit.getCustomer().getMonthlyIncome().intValue() + credit.getCustomer()
+                .getCreditNote() + 1000 <
+                (credit.getLoanAmount().intValue()) * (12 / credit.getTerm()))
         .collect(Collectors.toList());
 
   }
 
-  @Override // controller'a ekle, eğer o an giriş yapan employee'yi tutyorsa onu da set et
-  public  void rejectAllRiskyLoanApplications(){
-     getRiskyLoanApplications().forEach(
+  @Override
+  public void rejectAllRiskyLoanApplications() {
+    getRiskyLoanApplications().forEach(
         credit -> {
           credit.setStatus(CreditStatus.DENIED);
           creditRepository.save(credit);
-          rejectCredit(credit,"loan application found risky");
+          rejectCredit(credit, "loan application found risky");
+          // crediti reject edeni ekle
         }
     );
   }
 
+  @Override
+  public List<Credit> getCreditApprovalByDay(LocalDate localDate) {
+    return creditRepository.findAll().stream()
+        .filter(credit -> credit.getCustomer().getSubscriptionDate().equals(localDate))
+        .filter(credit -> credit.getStatus().equals(CreditStatus.APPROVED))
+        .collect(Collectors.toList());
+  }
+
+
+  @Override
+  public List<Credit> getHighLoanApplications() {
+    return getAllLoanApplications()
+        .stream()
+        .filter(credit -> credit.getTerm() * credit.getLoanAmount().intValue() > 200000)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Credit> getNormalLoanApplications() {
+    return getAllLoanApplications()
+        .stream()
+        .filter(credit -> credit.getTerm() * credit.getLoanAmount().intValue() < 200000)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Credit> getAllLoanApplications() {
+    return creditRepository.findAll()
+        .stream()
+        .filter(credit -> credit.getStatus() == CreditStatus.APPLIED)
+        .collect(Collectors.toList());
+
+  }
+
+  @Override
+  public List<List<BigInteger>> findCreditsByCustomerSubscriptionDateMonth(LocalDate localDate) {
+    List<List<BigInteger>> trendCreditStatusPerMonthlyList = new ArrayList<>();
+    for ( int i = 0; i < 12; i++ ) {
+      List<BigInteger> monhtly = new ArrayList<>();
+      creditRepository.getAllBetweenDates(localDate, localDate.plusMonths(1))
+          .forEach(creditStatus -> monhtly.add(creditStatus));
+      trendCreditStatusPerMonthlyList.add(monhtly);
+      localDate = localDate.plusMonths(1);
+    }
+    return trendCreditStatusPerMonthlyList;
+  }
+
+  @Override
+  public Credit getCredit(Long id) throws Exception {
+    return creditRepository.findById(id).orElseThrow(Exception::new);
+  }
 
   /****************************** FOR TEST*********************************/
   @Override
@@ -157,20 +232,5 @@ public class CreditManager implements ICreditService {
     return getCredit(id).getCustomer().getCredit();
   }
 
-    /*@Override
-  public List<Credit> getRiskyLoanApplications() {
-    List<Credit> creditList = null;
-    creditRepository.findAll().
-        stream()
-        .filter(credit -> credit.getStatus() == CreditStatus.APPLIED)
-        .forEach(credit -> {
-          if ( (credit.getCustomer().getMonthlyIncome().intValue() + credit.getCustomer()
-              .getCreditNote()) + 1000 > (credit.getLoanAmount().intValue()) * (12 / credit
-              .getTerm()) ) {
-            creditList.add(credit);
-          }
-        });
-    return creditList;
-  }*/
 
 }
