@@ -45,23 +45,12 @@ public class ReportController {
       model.addAttribute(s, integer);
     }));
 
-    //now add sales by lure type
-    List<Integer> inshoreSales = Arrays.asList(4074, 3455, 4112);
-    List<Integer> nearshoreSales = Arrays.asList(3222, 3011, 3788);
-    List<Integer> offshoreSales = Arrays.asList(7811, 7098, 6455);
 
-    LocalDate localDate = LocalDate.now();
     final int[] count = {0};
-
     iReportService.getTrendCreditStatusPerMonthly().forEach((bigIntegers -> {
       count[0]++;
-      System.out.println("status"+ count[0] + " " + bigIntegers);
       model.addAttribute("status"+ count[0], bigIntegers);
     }));
-
-    model.addAttribute("inshoreSales", inshoreSales);
-    model.addAttribute("nearshoreSales", nearshoreSales);
-    model.addAttribute("offshoreSales", offshoreSales);
 
     return "chart";
   }

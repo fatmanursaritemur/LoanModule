@@ -163,7 +163,6 @@ public class CreditManager implements ICreditService {
           credit.setStatus(CreditStatus.DENIED);
           creditRepository.save(credit);
           rejectCredit(credit, "loan application found risky");
-          // crediti reject edeni ekle
         }
     );
   }
